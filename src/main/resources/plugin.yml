@@ -1,0 +1,7 @@
+name: ArgumentsCollector
+version: 1.0
+main: cc.globalserver.ArgumentsCollector.Main
+commands:
+  ac:
+    description: Interactive Command Implement
+    usage: /<command> [arguments...]
