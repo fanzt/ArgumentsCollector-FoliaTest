@@ -47,7 +47,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener, TabCo
             messagesQueue.put(playerId, messages);
             commandQueue.put(playerId, cmd);
             
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "⎡" + ChatColor.WHITE + messages[0]);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.WHITE + messages[0]);
             return true;
         }
         return false;
@@ -75,10 +75,10 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener, TabCo
             }
 
             inputs.add(message);
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "⎣" + ChatColor.AQUA + message);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + message);
 
             if (inputs.size() < messages.length) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "⎡" + ChatColor.WHITE + messages[inputs.size()]);
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.WHITE + messages[inputs.size()]);
                 event.setCancelled(true);
                 return;
             }
