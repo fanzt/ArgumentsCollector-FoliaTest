@@ -96,29 +96,4 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener, TabCo
             event.setCancelled(true);
         }
     }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> tabCompleteList = new ArrayList<>();
-        if (sender instanceof Player) {
-            if (args.length == 1) {
-                for (Command cmd : Bukkit.getCommandMap().getKnownCommands().values()) {
-                    String cmdName = cmd.getName().toLowerCase();
-                    if (cmdName.startsWith(args[0].toLowerCase())) {
-                        tabCompleteList.add(cmdName);
-                    }
-                }
-            } else if (args.length > 1) {
-                Command targetCommand = Bukkit.getCommandMap().getKnownCommands().get(args[0]);
-                if (targetCommand != null) {
-                    String[] targetArgs = Arrays.copyOfRange(args, 1, args.length);
-                    List<String> targetSuggestions = targetCommand.tabComplete(sender, alias, targetArgs);
-                    if (targetSuggestions != null) {
-                        tabCompleteList.addAll(targetSuggestions);
-                    }
-                }
-            }
-        }
-        return tabCompleteList;
-    }
 }
