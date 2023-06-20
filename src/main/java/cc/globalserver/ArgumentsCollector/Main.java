@@ -28,15 +28,47 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player && command.getName().equalsIgnoreCase("ac") && args.length >= 2) {
             Player player = (Player) sender;
             UUID playerId = player.getUniqueId();
 
-            String cmd = args[0];
-            String[] messages = new String[args.length - 1];
-            System.arraycopy(args, 1, messages, 0, args.length - 1);
+            StringBuilder cmdBuilder = new StringBuilder();
+            boolean inQuotes = false;
+            List<String> argList = new ArrayList<>();
+            for (String arg : args) {
+                if (arg.startsWith("\"")) {
+                    inQuotes = true;
+                    arg = arg.substring(1);
+                }
+                if (arg.endsWith("\"")) {
+                    inQuotes = false;
+                    arg = arg.substring(0, arg.length() - 1);
+                }
+
+                if (inQuotes) {
+                    cmdBuilder.append(arg).append(" ");
+                } else {
+                    if (cmdBuilder.length() > 0) {
+                        cmdBuilder.append(arg);
+                        argList.add(cmdBuilder.toString());
+                        cmdBuilder.setLength(0);
+                    } else {
+                        argList.add(arg);
+                    }
+                }
+            }
+
+            if (argList.size() < 2) {
+                player.sendMessage(ChatColor.RED + "ERROR. Format: /ac \"<cmd>\" <arguments prompts>");
+                return true;
+            }
+
+            String cmd = argList.get(0);
+            String[] messages = new String[argList.size() - 1];
+            argList.subList(1, argList.size()).toArray(messages);
 
             playerInputs.put(playerId, new ArrayList<>());
             messagesQueue.put(playerId, messages);

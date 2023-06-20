@@ -5,4 +5,4 @@ main: cc.globalserver.ArgumentsCollector.Main
 commands:
   ac:
     description: Interactive Command Implement
-    usage: /<command> [arguments...]
+    usage: /<command> \"<cmd>\" <arguments prompts>
