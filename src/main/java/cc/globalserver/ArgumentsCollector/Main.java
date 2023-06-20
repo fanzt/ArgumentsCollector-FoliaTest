@@ -28,7 +28,6 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player && command.getName().equalsIgnoreCase("ac") && args.length >= 2) {
@@ -61,11 +60,6 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 }
             }
 
-            if (argList.size() < 2) {
-                player.sendMessage(ChatColor.RED + "ERROR. Format: /ac \"<cmd>\" <arguments prompts>");
-                return true;
-            }
-
             String cmd = argList.get(0);
             String[] messages = new String[argList.size() - 1];
             argList.subList(1, argList.size()).toArray(messages);
@@ -96,7 +90,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 playerInputs.remove(playerId);
                 messagesQueue.remove(playerId);
                 commandQueue.remove(playerId);
-                player.sendMessage(ChatColor.DARK_RED + "已取消执行");
+                player.sendMessage(ChatColor.DARK_RED + "已取消执行 Operation Cancelled");
                 event.setCancelled(true);
                 return;
             }
