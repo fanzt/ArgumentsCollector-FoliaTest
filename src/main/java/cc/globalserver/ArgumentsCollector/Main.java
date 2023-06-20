@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Map;
 
-public class Main extends JavaPlugin implements CommandExecutor, Listener, TabCompleter {
+public class Main extends JavaPlugin implements CommandExecutor, Listener{
 
     private final HashMap<UUID, List<String>> playerInputs = new HashMap<>();
     private final HashMap<UUID, String[]> messagesQueue = new HashMap<>();
