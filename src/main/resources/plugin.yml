@@ -1,5 +1,6 @@
 name: ArgumentsCollector
 version: 1.0
+api-version: 1.13
 main: cc.globalserver.ArgumentsCollector.Main
 commands:
   ac:
