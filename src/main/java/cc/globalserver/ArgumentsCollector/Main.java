@@ -68,7 +68,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             messagesQueue.put(playerId, messages);
             commandQueue.put(playerId, cmd);
 
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.WHITE + messages[0]);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[0]));
             return true;
         }
         return false;
@@ -99,7 +99,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + message);
 
             if (inputs.size() < messages.length) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (inputs.size() + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.WHITE + messages[inputs.size()]);
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (inputs.size() + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[inputs.size()]));
                 event.setCancelled(true);
                 return;
             }
