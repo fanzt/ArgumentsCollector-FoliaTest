@@ -24,8 +24,14 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
     @Override
     public void onEnable() {
+        getLogger().info("Welcome to Arguments Collector by Learting!");
         this.getCommand("ac").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, this);
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("Goodbye!");
     }
 
     @Override
