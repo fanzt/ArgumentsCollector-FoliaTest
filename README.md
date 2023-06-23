@@ -19,9 +19,9 @@
 
 #### 记录：
 ```
-[CHAT] ⌌(1/1) 请问你要说什么？
-[CHAT] ⌎test
-[CHAT] You whisper to Learting: test
+[Server] ⌌(1/1) 请问你要说什么？
+[Player] ⌎test
+[Server] You whisper to Learting: test
 ```
 
 结果等效于`/tell Learting test`。
@@ -34,9 +34,9 @@
 
 #### 记录：
 ```
-[CHAT] ⌌(1/1) 请问你想和谁说？
-[CHAT] ⌎Learting
-[CHAT] [我 -> Learting] 你在TestResidence里
+[Server] ⌌(1/1) 请问你想和谁说？
+[Player] ⌎Learting
+[Server] [我 -> Learting] 你在TestResidence里
 ```
 
 ---
@@ -59,9 +59,9 @@ Intended for use on Minecraft server menus to make the required commands interro
 
 #### Log:
 ```
-[CHAT] ⌌(1/1) What would you like to say?
-[CHAT] ⌎test
-[CHAT] You whisper to Learting: test
+[Server] ⌌(1/1) What would you like to say?
+[Player] ⌎test
+[Server] You whisper to Learting: test
 ```
 
 The result is equivalent to `/tell Learting test`.
@@ -74,7 +74,7 @@ The result is equivalent to `/tell Learting test`.
 
 #### Log:
 ```
-[CHAT] ⌌(1/1) "Who would you want to talk to?"
-[CHAT] ⌎Learting
-[CHAT] [Me -> Learting] I am now in TestResidence
+[Server] ⌌(1/1) "Who would you want to talk to?"
+[Player] ⌎Learting
+[Server] [Me -> Learting] I am now in TestResidence
 ```
