@@ -1,5 +1,6 @@
 package cc.globalserver.ArgumentsCollector;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,6 +22,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private final HashMap<UUID, List<String>> playerInputs = new HashMap<>();
     private final HashMap<UUID, String[]> messagesQueue = new HashMap<>();
     private final HashMap<UUID, String> commandQueue = new HashMap<>();
+    private final HashMap<UUID, Boolean> useFormatting = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -39,6 +41,12 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         if (sender instanceof Player && command.getName().equalsIgnoreCase("ac") && args.length >= 2) {
             Player player = (Player) sender;
             UUID playerId = player.getUniqueId();
+
+            boolean formatFlag = false;
+            if ("-f".equalsIgnoreCase(args[0])) {
+                formatFlag = true;
+                args = removeFirstElement(args);
+            }
 
             StringBuilder cmdBuilder = new StringBuilder();
             boolean inQuotes = false;
@@ -73,11 +81,18 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             playerInputs.put(playerId, new ArrayList<>());
             messagesQueue.put(playerId, messages);
             commandQueue.put(playerId, cmd);
+            useFormatting.put(playerId, formatFlag);
 
             player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[0]));
             return true;
         }
         return false;
+    }
+
+    private String[] removeFirstElement(String[] args) {
+        String[] newArray = new String[args.length - 1];
+        System.arraycopy(args, 1, newArray, 0, args.length - 1);
+        return newArray;
     }
 
     @EventHandler
@@ -89,6 +104,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             List<String> inputs = playerInputs.get(playerId);
             String[] messages = messagesQueue.get(playerId);
             String cmd = commandQueue.get(playerId);
+            boolean formatFlag = useFormatting.get(playerId);
 
             String message = event.getMessage();
 
@@ -96,6 +112,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 playerInputs.remove(playerId);
                 messagesQueue.remove(playerId);
                 commandQueue.remove(playerId);
+                useFormatting.remove(playerId);
                 player.sendMessage(ChatColor.DARK_RED + "已取消执行 Operation Cancelled");
                 event.setCancelled(true);
                 return;
@@ -110,18 +127,39 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 return;
             }
 
-            StringBuilder commandToExecute = new StringBuilder(cmd);
-            for (String input : inputs) {
-                commandToExecute.append(" ").append(input);
+            String commandToExecute;
+            if (formatFlag) {
+                commandToExecute = applyPlaceholders(player, cmd, inputs);
+            } else {
+                StringBuilder commandBuilder = new StringBuilder(cmd);
+                for (String input : inputs) {
+                    commandBuilder.append(" ").append(input);
+                }
+                commandToExecute = commandBuilder.toString();
             }
 
-            Bukkit.getScheduler().runTask(this, () -> player.performCommand(commandToExecute.toString()));
+            Bukkit.getScheduler().runTask(this, () -> player.performCommand(commandToExecute));
 
             playerInputs.remove(playerId);
             messagesQueue.remove(playerId);
             commandQueue.remove(playerId);
+            useFormatting.remove(playerId);
             event.setCancelled(true);
         }
     }
-}
 
+    private String applyPlaceholders(Player player, String cmd, List<String> inputs) {
+        String replacedCmd = cmd;
+        int inputIndex = 0;
+        while (replacedCmd.contains("%s") && inputIndex < inputs.size()) {
+            replacedCmd = replacedCmd.replaceFirst("%s", inputs.get(inputIndex));
+            inputIndex++;
+        }
+
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            replacedCmd = PlaceholderAPI.setPlaceholders(player, replacedCmd);
+        }
+
+        return replacedCmd;
+    }
+}

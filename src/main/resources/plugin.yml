@@ -1,9 +1,9 @@
 name: ArgumentsCollector
-version: 1.2
+version: 1.3
 api-version: 1.17
 author: Learting
 main: cc.globalserver.ArgumentsCollector.Main
 commands:
   ac:
     description: Interactive Command Implement
-    usage: /<command> "<cmd>" "<msg1>" "<msg2>" ... "<msgx>"
+    usage: /<command> (-f) <cmd> <msg1> <msg2> ... <msgx>
