@@ -1,14 +1,16 @@
 # ArgumentsCollector
 English version below
 
-仅用于Minecraft服务器菜单使用，让所需命令成为询问式交互
+用于Minecraft服务器使用，让所需命令成为询问式交互
 适合放在菜单中引导玩家使用命令
 
-用法：/ac <命令> <第一个参数的提示> <第二个参数的提示> ... <第X个参数的提示>
+-----------------------------------
+用法：/ac (-f) <命令> <第一个参数的提示> <第二个参数的提示> ... <第X个参数的提示>
 
 若命令或提示中有空格，只需要加上""，例如命令"tell Learting"、提示"请这样输入：1 2 3"
 
-
+询问中途输入q来退出
+-----------------------------------
 示例（菜单触发指令）：
 /ac "tell Learting" "请问你要说什么？"
 
@@ -18,29 +20,46 @@ English version below
 [CHAT] You whisper to Learting: test
 
 结果等效于/tell Learting test
+-----------------------------------
+格式化&PlaceHolderAPI示例：
+(玩家站在领地TestResidence内)
+/ac -f "tell %s 我在%residence_user_current_res%里" "请问你想和谁说？" 
 
-询问中途输入q来退出
+记录：
+[CHAT] ⌌(1/1) 请问你想和谁说？
+[CHAT] ⌎Learting
+[CHAT] [我 -> Learting] 你在TestResidence里
+-----------------------------------
+
 
 
 English version:
 
-For use on Minecraft server menus only, making the required commands interrogative interactions
+For use on Minecraft server menus, making the required commands interrogative interactions
 Ideal for placing in the menu to guide the player through the commands
 
-Usage: /ac <command> <prompt for the first argument> <prompt for the second argument> ... <prompt for xth argument> ...
+-----------------------------------
+Usage: /ac (-f) <command> <prompt for the first argument> <prompt for the second argument> ... <prompt for xth argument> ...
 
 If there are spaces in the command or prompt, just add "", e.g. command "tell Learting", prompt "Please enter like this: 1 2 3"
 
-
+enter 'q' to exit the process at anytime
+-----------------------------------
 Example (menu triggered command):
 /ac "tell Learting" "What would you like to say?"
 
-Record:
+Log:
 [CHAT] ⌌(1/1) What would you like to say?
 [CHAT] ⌎test
 [CHAT] You whisper to Learting: test
 
 The result is equivalent to /tell Learting test
+-----------------------------------
+Example with Formatting and PlaceHolderAPI:
+(Player is in residence 'TestResidence')
+/ac -f "tell %s I am now in %residence_user_current_res%" "Who would you want to talk to?"
 
-enter 'q' to exit the process at anytime
-
+Log:
+[CHAT] ⌌(1/1) "Who would you want to talk to?"
+[CHAT] ⌎Learting
+[CHAT] [Me -> Learting] I am now in TestResidence
