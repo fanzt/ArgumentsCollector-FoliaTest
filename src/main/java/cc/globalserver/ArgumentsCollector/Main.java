@@ -9,13 +9,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
@@ -23,11 +30,13 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private final HashMap<UUID, String[]> messagesQueue = new HashMap<>();
     private final HashMap<UUID, String> commandQueue = new HashMap<>();
     private final HashMap<UUID, Boolean> useFormatting = new HashMap<>();
+    private final HashMap<UUID, String> buttonResponse = new HashMap<>();
 
     @Override
     public void onEnable() {
         getLogger().info("Welcome to Arguments Collector by Learting!");
         this.getCommand("ac").setExecutor(this);
+        this.getCommand("ac_click").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
@@ -83,7 +92,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             commandQueue.put(playerId, cmd);
             useFormatting.put(playerId, formatFlag);
 
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[0]));
+            handleNextMessage(player, 0);
             return true;
         }
         return false;
@@ -93,6 +102,41 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         String[] newArray = new String[args.length - 1];
         System.arraycopy(args, 1, newArray, 0, args.length - 1);
         return newArray;
+    }
+
+    private void handleNextMessage(Player player, int index) {
+        UUID playerId = player.getUniqueId();
+        String[] messages = messagesQueue.get(playerId);
+
+        if (index < messages.length) {
+            String nextMessage = messages[index];
+            if (nextMessage.startsWith("$[")) {
+                Pattern pattern = Pattern.compile("\\$\\[(.*?)\\](.*)");
+                Matcher matcher = pattern.matcher(nextMessage);
+                if (matcher.find()) {
+                    String buttons = matcher.group(1);
+                    String prompt = matcher.group(2);
+
+                    String[] buttonPairs = buttons.split(",\\s*");
+                    TextComponent buttonsComponent = new TextComponent(ChatColor.LIGHT_PURPLE + "⏐  ");
+                    for (String buttonPair : buttonPairs) {
+                        String[] keyValue = buttonPair.split(":\\s*");
+                        String buttonText = keyValue[0].replaceAll("'", "").trim();
+                        String buttonValue = keyValue[1].replaceAll("'", "").trim();
+
+                        TextComponent buttonComponent = new TextComponent(ChatColor.YELLOW + "[" + ChatColor.GREEN + ChatColor.translateAlternateColorCodes('&', buttonText) + ChatColor.YELLOW + "]  ");
+                        buttonComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ac_click " + playerId + " " + buttonValue));
+
+                        buttonsComponent.addExtra(buttonComponent);
+                    }
+
+                    player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (index + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', prompt));
+                    player.spigot().sendMessage(buttonsComponent);
+                }
+            } else {
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (index + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[index]));
+            }
+        }
     }
 
     @EventHandler
@@ -118,11 +162,16 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 return;
             }
 
+            if (buttonResponse.containsKey(playerId)) {
+                message = buttonResponse.get(playerId);
+                buttonResponse.remove(playerId);
+            }
+
             inputs.add(message);
             player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + message);
 
             if (inputs.size() < messages.length) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (inputs.size() + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[inputs.size()]));
+                handleNextMessage(player, inputs.size());
                 event.setCancelled(true);
                 return;
             }
@@ -148,6 +197,24 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         }
     }
 
+    @EventHandler
+    public void onButtonClick(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        UUID playerId = player.getUniqueId();
+        String command = event.getMessage();
+
+        if (command.startsWith("/ac_click ")) {
+            String[] args = command.split(" ");
+            if (args.length == 3 && args[1].equals(playerId.toString())) {
+                String response = args[2];
+                buttonResponse.put(playerId, response);
+                event.setCancelled(true);
+                AsyncPlayerChatEvent chatEvent = new AsyncPlayerChatEvent(false, player, response, new HashSet<>(Bukkit.getOnlinePlayers()));
+                Bukkit.getPluginManager().callEvent(chatEvent);
+            }
+        }
+    }
+
     private String applyPlaceholders(Player player, String cmd, List<String> inputs) {
         String replacedCmd = cmd;
         int inputIndex = 0;
@@ -163,3 +230,4 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         return replacedCmd;
     }
 }
+

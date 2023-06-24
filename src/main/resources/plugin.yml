@@ -1,5 +1,5 @@
 name: ArgumentsCollector
-version: 1.3
+version: 1.4
 api-version: 1.17
 author: Learting
 main: cc.globalserver.ArgumentsCollector.Main
@@ -7,3 +7,6 @@ commands:
   ac:
     description: Interactive Command Implement
     usage: /<command> (-f) <cmd> <msg1> <msg2> ... <msgx>
+  ac_click:
+    description: internal use
+    usage: /<command>
