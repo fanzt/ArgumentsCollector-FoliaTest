@@ -32,6 +32,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private final HashMap<UUID, Boolean> useFormatting = new HashMap<>();
     private final HashMap<UUID, String> buttonResponse = new HashMap<>();
     private final HashMap<UUID, String> buttonTexts = new HashMap<>();
+    private final HashMap<UUID, Boolean> waitingForButtonClick = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -112,6 +113,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         if (index < messages.length) {
             String nextMessage = messages[index];
             if (nextMessage.startsWith("$[")) {
+                // Wait for button click
+                waitingForButtonClick.put(playerId, true);
                 Pattern pattern = Pattern.compile("\\$\\[(.*?)\\](.*)");
                 Matcher matcher = pattern.matcher(nextMessage);
                 if (matcher.find()) {
@@ -136,6 +139,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 }
             } else {
                 player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (index + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[index]));
+                // Not for button click
+                waitingForButtonClick.put(playerId, false);
             }
         }
     }
@@ -146,6 +151,21 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         UUID playerId = player.getUniqueId();
 
         if (playerInputs.containsKey(playerId)) {
+            // Return early if waiting for button click
+            if (waitingForButtonClick.getOrDefault(playerId, false)) {
+                String message = event.getMessage();
+                if ("q".equalsIgnoreCase(message)) {
+                    playerInputs.remove(playerId);
+                    messagesQueue.remove(playerId);
+                    commandQueue.remove(playerId);
+                    useFormatting.remove(playerId);
+                    waitingForButtonClick.remove(playerId);
+                    player.sendMessage(ChatColor.DARK_RED + "已取消执行 Operation Cancelled");
+                }
+                event.setCancelled(true);
+                return;
+            }
+
             List<String> inputs = playerInputs.get(playerId);
             String[] messages = messagesQueue.get(playerId);
             String cmd = commandQueue.get(playerId);
@@ -217,6 +237,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 event.setCancelled(true);
                 AsyncPlayerChatEvent chatEvent = new AsyncPlayerChatEvent(false, player, response, new HashSet<>(Bukkit.getOnlinePlayers()));
                 Bukkit.getPluginManager().callEvent(chatEvent);
+                // Reset
+                waitingForButtonClick.put(playerId, false);
             }
         }
     }
