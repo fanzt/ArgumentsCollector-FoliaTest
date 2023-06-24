@@ -120,7 +120,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 if (matcher.find()) {
                     String buttons = matcher.group(1);
                     String prompt = matcher.group(2);
-
+                    prompt = applyPlaceholders(player, prompt, new ArrayList<>());
                     String[] buttonPairs = buttons.split(",\\s*");
                     TextComponent buttonsComponent = new TextComponent(ChatColor.LIGHT_PURPLE + "⏐  ");
                     for (String buttonPair : buttonPairs) {
@@ -138,7 +138,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                     player.spigot().sendMessage(buttonsComponent);
                 }
             } else {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (index + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', messages[index]));
+                String prompt = applyPlaceholders(player, nextMessage, new ArrayList<>());
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "⌌" + ChatColor.GRAY + "(" + ChatColor.GOLD + (index + 1) + "/" + messages.length + ChatColor.GRAY + ") " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', prompt));
                 // Not for button click
                 waitingForButtonClick.put(playerId, false);
             }
