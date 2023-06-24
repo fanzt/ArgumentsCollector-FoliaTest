@@ -234,11 +234,15 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 String buttonText = args[3];
                 buttonResponse.put(playerId, response);
                 buttonTexts.put(playerId, buttonText);
-                event.setCancelled(true);
                 AsyncPlayerChatEvent chatEvent = new AsyncPlayerChatEvent(false, player, response, new HashSet<>(Bukkit.getOnlinePlayers()));
-                Bukkit.getPluginManager().callEvent(chatEvent);
                 // Reset
                 waitingForButtonClick.put(playerId, false);
+                event.setCancelled(true);
+                // Call with delay, for fixing button twice-click issue
+                Bukkit.getScheduler().runTaskLater(this, () -> {
+                    AsyncPlayerChatEvent delayedChatEvent = new AsyncPlayerChatEvent(false, player, response, new HashSet<>(Bukkit.getOnlinePlayers()));
+                    Bukkit.getPluginManager().callEvent(delayedChatEvent);
+                }, 1L);
             }
         }
     }
