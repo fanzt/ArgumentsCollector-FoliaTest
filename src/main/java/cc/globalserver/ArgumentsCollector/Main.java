@@ -31,6 +31,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private final HashMap<UUID, String> commandQueue = new HashMap<>();
     private final HashMap<UUID, Boolean> useFormatting = new HashMap<>();
     private final HashMap<UUID, String> buttonResponse = new HashMap<>();
+    private final HashMap<UUID, String> buttonTexts = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -125,7 +126,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                         String buttonValue = keyValue[1].replaceAll("'", "").trim();
 
                         TextComponent buttonComponent = new TextComponent(ChatColor.YELLOW + "[" + ChatColor.GREEN + ChatColor.translateAlternateColorCodes('&', buttonText) + ChatColor.YELLOW + "]  ");
-                        buttonComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ac_click " + playerId + " " + buttonValue));
+                        buttonComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ac_click " + playerId + " " + buttonValue + " " + buttonText));
 
                         buttonsComponent.addExtra(buttonComponent);
                     }
@@ -157,7 +158,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 messagesQueue.remove(playerId);
                 commandQueue.remove(playerId);
                 useFormatting.remove(playerId);
-                player.sendMessage(ChatColor.DARK_RED + "已取消执行 Operation Cancelled");
+                player.sendMessage(ChatColor.DARK_RED + "🗙");
                 event.setCancelled(true);
                 return;
             }
@@ -168,7 +169,10 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             }
 
             inputs.add(message);
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + message);
+
+            String displayMessage = buttonTexts.getOrDefault(playerId, message);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + displayMessage);
+            buttonTexts.remove(playerId);
 
             if (inputs.size() < messages.length) {
                 handleNextMessage(player, inputs.size());
@@ -205,9 +209,11 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
         if (command.startsWith("/ac_click ")) {
             String[] args = command.split(" ");
-            if (args.length == 3 && args[1].equals(playerId.toString())) {
+            if (args.length == 4 && args[1].equals(playerId.toString())) {
                 String response = args[2];
+                String buttonText = args[3];
                 buttonResponse.put(playerId, response);
+                buttonTexts.put(playerId, buttonText);
                 event.setCancelled(true);
                 AsyncPlayerChatEvent chatEvent = new AsyncPlayerChatEvent(false, player, response, new HashSet<>(Bukkit.getOnlinePlayers()));
                 Bukkit.getPluginManager().callEvent(chatEvent);
