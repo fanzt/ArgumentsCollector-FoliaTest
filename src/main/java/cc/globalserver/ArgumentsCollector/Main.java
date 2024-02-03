@@ -1,6 +1,9 @@
 package cc.globalserver.ArgumentsCollector;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+
+import cc.globalserver.ArgumentsCollector.Metrics;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -39,6 +42,11 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         getLogger().info("Welcome to Arguments Collector by Learting!");
         this.getCommand("ac").setExecutor(this);
         this.getCommand("ac_click").setExecutor(this);
+
+        // bstats
+        int pluginId = 18870; // <-- Replace with the id of your plugin!
+        Metrics metrics = new Metrics(this, pluginId);
+
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
@@ -192,7 +200,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             inputs.add(message);
 
             String displayMessage = buttonTexts.getOrDefault(playerId, message);
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + displayMessage);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "⌎" + ChatColor.AQUA + ChatColor.translateAlternateColorCodes('&', displayMessage));
             buttonTexts.remove(playerId);
 
             if (inputs.size() < messages.length) {
@@ -211,6 +219,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 }
                 commandToExecute = commandBuilder.toString();
             }
+            
+            getLogger().info("Player: " + player.getName().toString() + " |||| UUID: " + player.getUniqueId().toString() + " |||| Command: " + commandToExecute);
 
             Bukkit.getScheduler().runTask(this, () -> player.performCommand(commandToExecute));
 
