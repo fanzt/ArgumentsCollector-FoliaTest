@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    compileOnly("me.clip.placeholderapi:PlaceholderAPI:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
 java {
