@@ -60,7 +60,6 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         if (sender instanceof Player && command.getName().equalsIgnoreCase("ac") && args.length >= 2) {
             Player player = (Player) sender;
             UUID playerId = player.getUniqueId();
-
             boolean formatFlag = false;
             if ("-f".equalsIgnoreCase(args[0])) {
                 formatFlag = true;
@@ -70,38 +69,38 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             StringBuilder cmdBuilder = new StringBuilder();
             boolean inQuotes = false;
             List<String> argList = new ArrayList<>();
-            for (String arg : args) {
+            for (int i = 0; i < args.length; i++) {
+                String arg = args[i].replace("\\\"", "__ESCAPED_QUOTE__"); // Replace escaped quotes
                 if (arg.startsWith("\"")) {
                     inQuotes = true;
                     arg = arg.substring(1);
                 }
-                if (arg.endsWith("\"")) {
+                if (inQuotes && arg.endsWith("\"") && !arg.endsWith("\\\"")) {
                     inQuotes = false;
                     arg = arg.substring(0, arg.length() - 1);
                 }
+                arg = arg.replace("__ESCAPED_QUOTE__", "\""); // Restore escaped quotes
 
-                if (inQuotes) {
-                    cmdBuilder.append(arg).append(" ");
+                if (inQuotes || cmdBuilder.length() > 0) {
+                    cmdBuilder.append(arg).append(i < args.length - 1 ? " " : "");
                 } else {
-                    if (cmdBuilder.length() > 0) {
-                        cmdBuilder.append(arg);
-                        argList.add(cmdBuilder.toString());
-                        cmdBuilder.setLength(0);
-                    } else {
-                        argList.add(arg);
-                    }
+                    argList.add(arg);
                 }
+                if (!inQuotes && cmdBuilder.length() > 0) {
+                    argList.add(cmdBuilder.toString());
+                    cmdBuilder.setLength(0);
+                }
+            }
+            if (cmdBuilder.length() > 0) {
+                argList.add(cmdBuilder.toString());
             }
 
             String cmd = argList.get(0);
-            String[] messages = new String[argList.size() - 1];
-            argList.subList(1, argList.size()).toArray(messages);
-
+            String[] messages = argList.subList(1, argList.size()).toArray(new String[0]);
             playerInputs.put(playerId, new ArrayList<>());
             messagesQueue.put(playerId, messages);
             commandQueue.put(playerId, cmd);
             useFormatting.put(playerId, formatFlag);
-
             handleNextMessage(player, 0);
             return true;
         }
