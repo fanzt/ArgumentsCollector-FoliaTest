@@ -222,7 +222,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             
             getLogger().info("Player: " + player.getName().toString() + " |||| UUID: " + player.getUniqueId().toString() + " |||| Command: " + commandToExecute);
 
-            Bukkit.getScheduler().runTask(this, () -> player.performCommand(commandToExecute));
+            player.getScheduler().run(this, t -> player.performCommand(commandToExecute), null);
 
             playerInputs.remove(playerId);
             messagesQueue.remove(playerId);
@@ -250,10 +250,10 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 waitingForButtonClick.put(playerId, false);
                 event.setCancelled(true);
                 // Call with delay, for fixing button twice-click issue
-                Bukkit.getScheduler().runTaskLater(this, () -> {
+                player.getScheduler().execute(this, () -> {
                     AsyncPlayerChatEvent delayedChatEvent = new AsyncPlayerChatEvent(false, player, response, new HashSet<>(Bukkit.getOnlinePlayers()));
                     Bukkit.getPluginManager().callEvent(delayedChatEvent);
-                }, 1L);
+                }, null, 1L);
             }
         }
     }
